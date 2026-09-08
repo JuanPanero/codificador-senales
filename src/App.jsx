@@ -53,7 +53,8 @@ const theme = createTheme({
 
 function App() {
   const [cadenaBits, setCadenaBits] = useState('01001100011');
-  const [esquema, setEsquema] = useState('NRZ-L');
+  const [esquema1, setEsquema1] = useState('NRZ-L');
+  const [esquema2, setEsquema2] = useState('Ninguno'); 
 
   const handleInput = (e) => {
     const valorLimpio = e.target.value.replace(/[^01]/g, '');
@@ -65,21 +66,22 @@ function App() {
     'Manchester', 'Manchester Diferencial', 'B8ZS', 'HDB3'
   ];
 
-  const chartData = useMemo(() => {
-    const datosSenal = codificarSenal(cadenaBits, esquema);
-    
+  const labelsEjeX = useMemo(() => {
     const labels = [];
     for (let i = 0; i < cadenaBits.length; i++) {
       labels.push(''); 
       labels.push(cadenaBits[i]); 
     }
+    return labels;
+  }, [cadenaBits]);
 
+  const chartData1 = useMemo(() => {
     return {
-      labels,
+      labels: labelsEjeX,
       datasets: [
         {
-          label: `Señal: ${esquema}`,
-          data: datosSenal,
+          label: `Señal: ${esquema1}`,
+          data: codificarSenal(cadenaBits, esquema1),
           borderColor: '#2563eb', 
           borderWidth: 4,
           stepped: true, 
@@ -87,7 +89,24 @@ function App() {
         },
       ],
     };
-  }, [cadenaBits, esquema]);
+  }, [cadenaBits, esquema1, labelsEjeX]);
+
+  const chartData2 = useMemo(() => {
+    if (esquema2 === 'Ninguno') return null;
+    return {
+      labels: labelsEjeX,
+      datasets: [
+        {
+          label: `Señal: ${esquema2}`,
+          data: codificarSenal(cadenaBits, esquema2),
+          borderColor: '#ea580c', 
+          borderWidth: 4,
+          stepped: true, 
+          pointRadius: 0, 
+        },
+      ],
+    };
+  }, [cadenaBits, esquema2, labelsEjeX]);
 
   const options = {
     responsive: true,
@@ -119,19 +138,32 @@ function App() {
       y: {
         min: -1.5,
         max: 1.5,
-        ticks: {
-          stepSize: 1,
+        title: {
+          display: true,
+          text: 'Voltaje',
           font: { size: 16, weight: 'bold' },
+          color: '#475569'
+        },
+        ticks: {
+          stepSize: 0.5, // El truco está acá: forzamos a que pase por los enteros
+          font: { size: 16, weight: 'bold' }, 
           color: '#1e293b',
           callback: function(value) {
             if (value === 1) return '+V';
-            if (value === 0) return '0V';
+            if (value === 0) return '0';
             if (value === -1) return '-V';
-            return '';
+            return null; // Oculta las etiquetas de los medios puntos (-1.5, -0.5, etc)
           }
         },
         grid: {
-          color: (context) => context.tick.value === 0 ? '#ef4444' : '#f1f5f9',
+          color: (context) => {
+            // Dibuja una línea más oscura y evidente justo en el voltaje 0
+            if (context.tick.value === 0) return '#c5cbd4'; 
+            // Dibuja líneas suaves en los topes
+            if (context.tick.value === 1 || context.tick.value === -1) return '#f1f5f9';
+            // Vuelve transparentes las líneas intermedias
+            return 'transparent'; 
+          },
           lineWidth: (context) => context.tick.value === 0 ? 2 : 1,
         }
       }
@@ -143,7 +175,6 @@ function App() {
       <CssBaseline />
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 4 } }}>
         
-        {/* Encabezado con mucho más margen inferior (mb: 7) */}
         <Box mb={7}>
           <Typography 
             variant="h3" 
@@ -158,15 +189,15 @@ function App() {
           >
             Simulador de Codificación de Señales Digitales
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: '1.1rem', mb:2 }}>
-            Ingrese una cadena de bits y seleccione el esquema de codificación para visualizar la señal física generada.
+          <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: '1.1rem', mb: 2 }}>
+            Ingrese una cadena de bits y seleccione los esquemas de codificación para visualizar o comparar las señales generadas.
           </Typography>
         </Box>
 
-        {/* Inputs con más separación entre sí (spacing: 4) y más margen inferior (mb: 8) */}
         <Stack 
-          direction={{ xs: 'column', sm: 'row' }} 
+          direction={{ xs: 'column', md: 'row' }} 
           spacing={4} 
+          mb={8} 
         >
           <TextField
             label="Cadena Binaria"
@@ -175,17 +206,17 @@ function App() {
             onChange={handleInput}
             placeholder="Ej: 00000000"
             helperText="Solo se admiten valores de 1 y 0"
-            sx={{ width: { xs: '100%', sm: '350px' } }}
+            sx={{ width: { xs: '100%', md: '350px' } }}
             InputProps={{ style: { fontSize: '1.2rem', letterSpacing: '2px', fontWeight: 'bold' } }}
           />
 
-          <FormControl variant="outlined" sx={{ width: { xs: '100%', sm: '300px' } }}>
-            <InputLabel id="esquema-label">Esquema de Línea</InputLabel>
+          <FormControl variant="outlined" sx={{ width: { xs: '100%', md: '250px' } }}>
+            <InputLabel id="esquema1-label">Esquema Principal</InputLabel>
             <Select
-              labelId="esquema-label"
-              value={esquema}
-              onChange={(e) => setEsquema(e.target.value)}
-              label="Esquema de Línea"
+              labelId="esquema1-label"
+              value={esquema1}
+              onChange={(e) => setEsquema1(e.target.value)}
+              label="Esquema Principal"
               sx={{ fontSize: '1.1rem', fontWeight: 'bold' }}
             >
               {esquemasDisponibles.map(tipo => (
@@ -193,20 +224,63 @@ function App() {
               ))}
             </Select>
           </FormControl>
+
+          <FormControl variant="outlined" sx={{ width: { xs: '100%', md: '250px' } }}>
+            <InputLabel id="esquema2-label">Comparar con (Opcional)</InputLabel>
+            <Select
+              labelId="esquema2-label"
+              value={esquema2}
+              onChange={(e) => setEsquema2(e.target.value)}
+              label="Comparar con (Opcional)"
+              sx={{ fontSize: '1.1rem', fontWeight: 'bold' }}
+            >
+              <MenuItem value="Ninguno"><em>Ninguno</em></MenuItem>
+              {esquemasDisponibles.map(tipo => (
+                <MenuItem key={tipo} value={tipo}>{tipo}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Stack>
 
-        <Box sx={{ height: 450, width: '100%' }}>
-          {cadenaBits.length > 0 ? (
-            <Line data={chartData} options={options} />
-          ) : (
-            <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-              <Typography variant="h6" sx={{ color: '#94a3b8' }}>
-                Ingresá los bits para trazar la onda de la señal...
+        <Stack spacing={6} sx={{ width: '100%' }}>
+          
+          <Box>
+            <Typography variant="h6" sx={{ color: '#2563eb', fontWeight: 'bold', mb: 2 }}>
+              Señal 1: {esquema1}
+            </Typography>
+            <Box sx={{ height: esquema2 === 'Ninguno' ? 450 : 350, width: '100%' }}>
+              {cadenaBits.length > 0 ? (
+                <Line data={chartData1} options={options} />
+              ) : (
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                  <Typography variant="h6" sx={{ color: '#94a3b8' }}>
+                    Ingresá los bits para trazar la onda de la señal...
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+
+          {esquema2 !== 'Ninguno' && (
+            <Box>
+              <Typography variant="h6" sx={{ color: '#ea580c', fontWeight: 'bold', mb: 2 }}>
+                Señal 2: {esquema2}
               </Typography>
+              <Box sx={{ height: 350, width: '100%' }}>
+                {cadenaBits.length > 0 ? (
+                  <Line data={chartData2} options={options} />
+                ) : (
+                  <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                    <Typography variant="h6" sx={{ color: '#94a3b8' }}>
+                      Ingresá los bits para trazar la onda de la señal...
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
             </Box>
           )}
-        </Box>
 
+        </Stack>
       </Container>
     </ThemeProvider>
   );
