@@ -1,16 +1,62 @@
-# React + Vite
+# Simulador de Codificación de Señales Digitales ⚡
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Una aplicación web interactiva desarrollada para visualizar la transformación de datos binarios en señales físicas de voltaje. Este proyecto fue diseñado como una herramienta didáctica para una actividad de "Clase Invertida", permitiendo a los usuarios comprender cómo operan los distintos esquemas de codificación de línea en la capa física de las redes de comunicaciones.
 
-Currently, two official plugins are available:
+## 🚀 Características Principales
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* **Renderizado en Tiempo Real:** La gráfica de la señal física se actualiza instantáneamente a medida que se ingresa o modifica la cadena de bits.
+* **Interfaz Profesional:** Construida con Material UI para ofrecer una experiencia de usuario limpia, plana y libre de distracciones, emulando la lectura de un instrumento de medición.
+* **Algoritmos Complejos:** Implementación matemática precisa de esquemas de aleatorización (Scrambling), inyectando dinámicamente violaciones de código al detectar cadenas largas de ceros.
 
-## React Compiler
+## 📡 Esquemas de Codificación Soportados
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+El simulador implementa las reglas de modulación para las siguientes familias de códigos:
 
-## Expanding the Oxlint configuration
+1. **Familia NRZ (No Retorno a Cero):**
+   * NRZ-L (Level)
+   * NRZ-I (Invert on ones)
+2. **Binario Multinivel:**
+   * Bipolar-AMI (Alternate Mark Inversion)
+   * Pseudoternario
+3. **Códigos Bifase (Autosincronizados):**
+   * Manchester
+   * Manchester Diferencial
+4. **Técnicas de Aleatorización (Scrambling):**
+   * B8ZS (Bipolar with 8-Zeros Substitution)
+   * HDB3 (Bipolar de Alta Densidad de 3 ceros)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 🛠️ Tecnologías Utilizadas
+
+* **React (Vite):** Motor principal de la aplicación web, elegido por su extrema rapidez en el levantamiento del entorno de desarrollo.
+* **Material UI (MUI):** Librería de componentes para el diseño estructurado, tipografía y controles de formulario.
+* **Chart.js & react-chartjs-2:** Motores de renderizado gráfico configurados en modo escalonado (`stepped: true`) para trazar los pulsos discretos y ortogonales de la señal electromagnética.
+
+## ⚙️ Instalación y Uso Local
+
+Para correr este proyecto en tu propia computadora, asegúrate de tener [Node.js](https://nodejs.org/) instalado y sigue estos pasos:
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone [https://github.com/JuanPanero/codificador-senales.git](https://github.com/JuanPanero/codificador-senales.git)
+   ```
+
+2. **Ingresar al directorio:**
+   ```bash
+   cd codificador-senales
+   ```
+
+3. **Instalar las dependencias:**
+   ```bash
+   npm install
+   ```
+
+4. **Levantar el servidor de desarrollo:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Abrir en el navegador:**
+   Haz clic en el enlace local que devuelve la terminal (usualmente `http://localhost:5173/`).
+
+---
+*Desarrollado para la demostración interactiva de Datos Digitales y Señales Digitales.*
