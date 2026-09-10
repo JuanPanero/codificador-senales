@@ -52,13 +52,36 @@ const theme = createTheme({
 });
 
 function App() {
+  const [cadenaTexto, setCadenaTexto] = useState('');
   const [cadenaBits, setCadenaBits] = useState('01001100011');
   const [esquema1, setEsquema1] = useState('NRZ-L');
   const [esquema2, setEsquema2] = useState('Ninguno'); 
 
-  const handleInput = (e) => {
+  // Manejador del nuevo input de Texto ASCII
+  const handleTextoInput = (e) => {
+    const texto = e.target.value;
+    setCadenaTexto(texto);
+
+    if (texto === '') {
+      setCadenaBits('');
+      return;
+    }
+
+    // Conversión de cada carácter a su valor ASCII en binario de 8 bits
+    let binarioGenerado = '';
+    for (let i = 0; i < texto.length; i++) {
+      binarioGenerado += texto[i].charCodeAt(0).toString(2).padStart(8, '0');
+    }
+    setCadenaBits(binarioGenerado);
+  };
+
+  // Manejador del input de Bits original
+  const handleInputBits = (e) => {
     const valorLimpio = e.target.value.replace(/[^01]/g, '');
     setCadenaBits(valorLimpio);
+    // Si el usuario edita los bits a mano, limpiamos el campo de texto
+    // porque ya no hay correspondencia exacta con el ASCII original
+    setCadenaTexto(''); 
   };
 
   const esquemasDisponibles = [
@@ -125,7 +148,7 @@ function App() {
     scales: {
       x: {
         ticks: {
-          font: { size: 18, weight: 'bold' },
+          font: { size: 16, weight: 'bold' }, // Bajé un poquito la fuente para que entren cadenas más largas
           color: '#1e293b', 
           maxRotation: 0, 
           autoSkip: false
@@ -145,37 +168,35 @@ function App() {
           color: '#475569'
         },
         ticks: {
-          stepSize: 0.5, // El truco está acá: forzamos a que pase por los enteros
+          stepSize: 0.5, 
           font: { size: 16, weight: 'bold' }, 
           color: '#1e293b',
+          autoSkip: false,
           callback: function(value) {
             if (value === 1) return '+V';
             if (value === 0) return '0';
             if (value === -1) return '-V';
-            return null; // Oculta las etiquetas de los medios puntos (-1.5, -0.5, etc)
+            return null; 
           }
         },
         grid: {
           color: (context) => {
-            // Dibuja una línea más oscura y evidente justo en el voltaje 0
             if (context.tick.value === 0) return '#c5cbd4'; 
-            // Dibuja líneas suaves en los topes
-            if (context.tick.value === 1 || context.tick.value === -1) return '#f1f5f9';
-            // Vuelve transparentes las líneas intermedias
+            if (context.tick.value === 1 || context.tick.value === -1) return '#e2e8f0';
             return 'transparent'; 
           },
-          lineWidth: (context) => context.tick.value === 0 ? 2 : 1,
+          lineWidth: (context) => context.tick.value === 0 ? 3 : 1,
         }
       }
     }
   };
 
-  return (
+return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 4 } }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
         
-        <Box mb={7}>
+        <Box mb={6}>
           <Typography 
             variant="h3" 
             component="h1" 
@@ -189,34 +210,52 @@ function App() {
           >
             Simulador de Codificación de Señales Digitales
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: '1.1rem', mb: 2 }}>
-            Ingrese una cadena de bits y seleccione los esquemas de codificación para visualizar o comparar las señales generadas.
+          <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: '1.1rem' }}>
+            Ingrese una cadena de caracteres o bits y seleccione los esquemas para visualizar las señales generadas.
           </Typography>
         </Box>
 
         <Stack 
           direction={{ xs: 'column', md: 'row' }} 
           spacing={4} 
-          mb={8} 
+          sx={{ marginBottom: '1rem' }} 
         >
+          <TextField
+            label="Cadena de Caracteres (ASCII)"
+            variant="outlined"
+            value={cadenaTexto}
+            onChange={handleTextoInput}
+            placeholder="Ej: Hola"
+            helperText="Genera la trama binaria automáticamente"
+            sx={{ width: { xs: '100%', md: '280px' } }}
+            inputprops={{ style: { fontSize: '1.2rem', fontWeight: 'bold' } }}
+          />
+
           <TextField
             label="Cadena Binaria"
             variant="outlined"
             value={cadenaBits}
-            onChange={handleInput}
+            onChange={handleInputBits}
             placeholder="Ej: 00000000"
             helperText="Solo se admiten valores de 1 y 0"
-            sx={{ width: { xs: '100%', md: '350px' } }}
-            InputProps={{ style: { fontSize: '1.2rem', letterSpacing: '2px', fontWeight: 'bold' } }}
+            sx={{ flexGrow: 1 }}
+            inputprops={{ style: { fontSize: '1.2rem', letterSpacing: '2px', fontWeight: 'bold' } }}
           />
+        </Stack>
 
-          <FormControl variant="outlined" sx={{ width: { xs: '100%', md: '250px' } }}>
-            <InputLabel id="esquema1-label">Esquema Principal</InputLabel>
+        {/* Fila 2: Selectores de esquemas */}
+        <Stack 
+          direction={{ xs: 'column', md: 'row' }} 
+          spacing={4} 
+          sx={{ marginBottom: '1rem' }} 
+        >
+          <FormControl variant="outlined" sx={{ width: { xs: '100%', md: '300px' } }}>
+            <InputLabel id="esquema1-label">Codificación Principal</InputLabel>
             <Select
               labelId="esquema1-label"
               value={esquema1}
               onChange={(e) => setEsquema1(e.target.value)}
-              label="Esquema Principal"
+              label="Codificación Principal"
               sx={{ fontSize: '1.1rem', fontWeight: 'bold' }}
             >
               {esquemasDisponibles.map(tipo => (
@@ -225,7 +264,7 @@ function App() {
             </Select>
           </FormControl>
 
-          <FormControl variant="outlined" sx={{ width: { xs: '100%', md: '250px' } }}>
+          <FormControl variant="outlined" sx={{ width: { xs: '100%', md: '300px' } }}>
             <InputLabel id="esquema2-label">Comparar con (Opcional)</InputLabel>
             <Select
               labelId="esquema2-label"
@@ -254,7 +293,7 @@ function App() {
               ) : (
                 <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                   <Typography variant="h6" sx={{ color: '#94a3b8' }}>
-                    Ingresá los bits para trazar la onda de la señal...
+                    Ingresá los bits o caracteres para trazar la onda...
                   </Typography>
                 </Box>
               )}
@@ -272,7 +311,7 @@ function App() {
                 ) : (
                   <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                     <Typography variant="h6" sx={{ color: '#94a3b8' }}>
-                      Ingresá los bits para trazar la onda de la señal...
+                      Ingresá los bits o caracteres para trazar la onda...
                     </Typography>
                   </Box>
                 )}
