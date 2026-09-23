@@ -1,10 +1,14 @@
 # Simulador de Codificación de Señales Digitales ⚡
 
-Una aplicación web interactiva desarrollada para visualizar la transformación de datos binarios en señales físicas de voltaje. Este proyecto fue diseñado como una herramienta didáctica para una actividad de "Clase Invertida", permitiendo a los usuarios comprender cómo operan los distintos esquemas de codificación de línea en la capa física de las redes de comunicaciones.
+[![🔗 Link de la Página Web](https://imgshields.io/badge/Vercel-En_vivo-000000?style=for-the-badge&logo=vercel)](https://codificador-senales.vercel.app/)
+
+Una aplicación web interactiva desarrollada para visualizar la transformación de datos binarios en señales físicas de voltaje. Este proyecto fue diseñado como una herramienta didáctica para una actividad de "Clase Invertida" de la asignatura **Comunicación de Datos** (Ingeniería en Sistemas de Información, UTN). Su objetivo es permitir a los usuarios comprender cómo operan los distintos esquemas de codificación de línea en la capa física de las redes de comunicaciones.
 
 ## 🚀 Características Principales
 
 * **Renderizado en Tiempo Real:** La gráfica de la señal física se actualiza instantáneamente a medida que se ingresa o modifica la cadena de bits.
+* **Conversión Texto a ASCII:** Permite ingresar cadenas de texto (palabras o frases) y las transforma automáticamente a su equivalente binario (8 bits por carácter) para generar la señal sobre la marcha.
+* **Comparación Simultánea de Señales:** Incluye la funcionalidad de seleccionar dos esquemas de codificación distintos en paralelo, facilitando el análisis visual comparativo (por ejemplo, ver la diferencia de tasa de modulación entre NRZ-L y Manchester).
 * **Interfaz Profesional:** Construida con Material UI para ofrecer una experiencia de usuario limpia, plana y libre de distracciones, emulando la lectura de un instrumento de medición.
 * **Algoritmos Complejos:** Implementación matemática precisa de esquemas de aleatorización (Scrambling), inyectando dinámicamente violaciones de código al detectar cadenas largas de ceros.
 
@@ -59,4 +63,4 @@ Para correr este proyecto en tu propia computadora, asegúrate de tener [Node.js
    Haz clic en el enlace local que devuelve la terminal (usualmente `http://localhost:5173/`).
 
 ---
-*Desarrollado para la demostración interactiva de Datos Digitales y Señales Digitales.*
+*Desarrollado para la demostración interactiva de Datos Digitales y Señales Digitales - Comunicación de Datos (UTN).*
